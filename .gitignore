@@ -1,4 +1,5 @@
 .venv/
+.env
 .idea/workspace.xml
 .idea/shelf/
 .idea/dictionaries/
