@@ -5,4 +5,5 @@ data/
 .idea/shelf/
 .idea/dictionaries/
 notebooks/rough.ipynb
+models/audio_autoencoder.pth
 notes.txt

@@ -151,5 +151,7 @@ for epoch in range(num_epochs):
 print("\nTraining Complete!")
 
 # save the trained model
-torch.save(model.state_dict(), "audio_autoencoder.pth")
+torch.save({'model_state_dict': model.state_dict(), 'optimizer_state_dict': optimizer.state_dict(),
+    'train_losses': train_losses, 'val_losses': val_losses, 'epoch': epoch + 1
+}, "../models/audio_autoencoder.pth")
 print("Model saved to audio_autoencoder.pth")
