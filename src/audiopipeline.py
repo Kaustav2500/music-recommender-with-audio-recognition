@@ -38,6 +38,7 @@ class AudioPipeline(Dataset):
             waveform = torch.nn.functional.pad(waveform, (0, padding))
 
         mel_spec = self.mel_transform(waveform)
+        mel_spec = self.db_transform(mel_spec)
         mel_spec = F.interpolate(mel_spec.unsqueeze(0), size=(128, 128), mode='bilinear', align_corners=False).squeeze(0)
 
         return mel_spec, self.labels[idx]
