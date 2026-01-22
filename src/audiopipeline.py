@@ -4,6 +4,7 @@ import torchaudio.transforms as T
 import torch.nn.functional as F
 from torch.utils.data import Dataset, DataLoader
 from src.preprocessing import df
+from torch.utils.data import random_split
 
 class AudioPipeline(Dataset):
     def __init__(self, audio_file_labels, audio_file_path, target_sr=44100, duration_sec=5.0):
@@ -41,9 +42,7 @@ class AudioPipeline(Dataset):
 
         return mel_spec, self.labels[idx]
 
-
-from torch.utils.data import random_split
-
+# create the dataset
 full_dataset = AudioPipeline(df['file_name'], df['file_path'])
 
 # splitting the dataset
