@@ -31,6 +31,7 @@ else:
             name_no_ext = os.path.splitext(file)[0]
             clean_name = re.sub(r'[^a-zA-Z\s,-]', '', name_no_ext)
             clean_name = re.sub(r'\s+', ' ', clean_name).strip()
+            clean_name = re.sub(r'^[\s-]+', '', clean_name)
 
             # load audio
             try:
