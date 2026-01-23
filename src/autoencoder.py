@@ -85,7 +85,7 @@ if __name__ == "__main__":
         # iterate through batches
         for batch_idx, data in enumerate(tqdm(train_loader, desc=f"Epoch {epoch + 1}/{num_epochs}")):
 
-            # extract spectrograms from tuples or list
+            # extract spectrogram from tuples or list
             if isinstance(data, list) or isinstance(data, tuple):
                 data = data[0]
 
@@ -122,7 +122,7 @@ if __name__ == "__main__":
 
         with torch.no_grad():
             for batch_idx, data in enumerate(test_loader):
-                # extract spectrograms from tuple or list
+                # extract spectrogram from tuple or list
                 if isinstance(data, list) or isinstance(data, tuple):
                     data = data[0]
 
