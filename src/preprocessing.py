@@ -1,4 +1,5 @@
 import os
+import re
 import pandas as pd
 import torch
 import torchaudio
@@ -26,8 +27,17 @@ else:
         if file.endswith((".mp3", ".wav", ".flac")):
             path = os.path.join(folder_path, file)
 
+            # clean the file name
+            name_no_ext = os.path.splitext(file)[0]
+            clean_name = re.sub(r'[^a-zA-Z\s,-]', '', name_no_ext)
+            clean_name = re.sub(r'\s+', ' ', clean_name).strip()
+
             # load audio
-            waveform, sample_rate = torchaudio.load(path)
+            try:
+                waveform, sample_rate = torchaudio.load(path)
+            except Exception as e:
+                print(f"Error loading {file}: {e}")
+                continue
 
             # convert to mono if stereo
             if waveform.shape[0] > 1:
@@ -54,7 +64,7 @@ else:
             mel_spec_db = mel_spec_db[0].numpy()
 
             song_data.append({
-                "file_name": file,
+                "file_name": clean_name,
                 "file_path": path,
                 "audio_data": mel_spec_db
             })
