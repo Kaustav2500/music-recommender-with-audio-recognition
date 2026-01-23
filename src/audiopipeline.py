@@ -5,6 +5,13 @@ from src.preprocessing import df
 
 
 class AudioPipeline(Dataset):
+    """
+    Custom Dataset for loading pre-processed audio data and labels
+    1. Converts numpy arrays to PyTorch tensors
+    2. Resizes tensors to 128x128
+    3. Adds a channel dimension
+    4. Returns the processed tensor and corresponding label
+    """
     def __init__(self, audio_data, labels):
         self.audio_data = list(audio_data)
         self.labels = list(labels)

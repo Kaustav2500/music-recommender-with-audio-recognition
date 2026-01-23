@@ -7,6 +7,10 @@ from src.preprocessing import df
 
 # redefine class locally
 class AudioAutoencoder(nn.Module):
+    """
+    Autoencoder model for audio spectrogram
+    It is redefined here to load the pretrained weights
+    """
     def __init__(self):
         super(AudioAutoencoder, self).__init__()
         # encoder
