@@ -13,19 +13,19 @@ class AudioAutoencoder(nn.Module):
             # input: [batch, 1, 128, 128]
             nn.Conv2d(1, 32, kernel_size=3, stride=2, padding=1),  # output: [batch, 32, 64, 64]
             nn.BatchNorm2d(32),
-            nn.ReLU(),
+            nn.LeakyReLU(0.2), # optimization: leaky relu prevents dead neurons
             nn.Conv2d(32, 64, kernel_size=3, stride=2, padding=1),  # output: [batch, 64, 32, 32]
             nn.BatchNorm2d(64),
-            nn.ReLU(),
+            nn.LeakyReLU(0.2),
             nn.Conv2d(64, 128, kernel_size=3, stride=2, padding=1),  # output: [batch, 128, 16, 16]
             nn.BatchNorm2d(128),
-            nn.ReLU(),
+            nn.LeakyReLU(0.2),
             nn.Conv2d(128, 256, kernel_size=3, stride=2, padding=1),  # output: [batch, 256, 8, 8]
             nn.BatchNorm2d(256),
-            nn.ReLU(),
+            nn.LeakyReLU(0.2),
             nn.Flatten(),                                                                   # output: [batch, 256*8*8 = 16384]
             nn.Linear(16384, 512),                                    # output: [batch, 512]
-            nn.ReLU(),
+            nn.LeakyReLU(0.2),
             nn.Linear(512, 256)  # final latent representation
         )
 
@@ -33,19 +33,19 @@ class AudioAutoencoder(nn.Module):
         self.decoder = nn.Sequential(
             # input: [batch, 256]
             nn.Linear(256, 512),  # expand latent space gradually
-            nn.ReLU(),
+            nn.LeakyReLU(0.2),
             nn.Linear(512, 16384),  # output: [batch, 16384]
-            nn.ReLU(),
+            nn.LeakyReLU(0.2),
             nn.Unflatten(1, (256, 8, 8)),  # output: [batch, 256, 8, 8]
             nn.ConvTranspose2d(256, 128, kernel_size=3, stride=2, padding=1, output_padding=1),  # [batch, 128, 16, 16]
             nn.BatchNorm2d(128),
-            nn.ReLU(),
+            nn.LeakyReLU(0.2),
             nn.ConvTranspose2d(128, 64, kernel_size=3, stride=2, padding=1, output_padding=1),  # [batch, 64, 32, 32]
             nn.BatchNorm2d(64),
-            nn.ReLU(),
+            nn.LeakyReLU(0.2),
             nn.ConvTranspose2d(64, 32, kernel_size=3, stride=2, padding=1, output_padding=1),  # [batch, 32, 64, 64]
             nn.BatchNorm2d(32),
-            nn.ReLU(),
+            nn.LeakyReLU(0.2),
             nn.ConvTranspose2d(32, 1, kernel_size=3, stride=2, padding=1, output_padding=1),  # [batch, 1, 128, 128]
             nn.Sigmoid()                                # normalize output to [0, 1] range
         )
@@ -63,7 +63,7 @@ print(f"Using device: {device}")
 
 # initialize model and move to device
 model = AudioAutoencoder().to(device)
-print(model)
+# print(model)
 
 # define loss function and optimizer
 criterion = nn.MSELoss()
@@ -90,9 +90,10 @@ for epoch in range(num_epochs):
         # move data to device
         data = data.to(device)
 
-        # normalize input to [0, 1] range if not already
-        if data.max() > 1.0:
-            data = (data - data.min()) / (data.max() - data.min() + 1e-8)
+        # optimization: global normalization
+        # map typical dB range (-80 to 0) to (0 to 1)
+        data = (data + 80) / 80
+        data = torch.clamp(data, 0.0, 1.0) # ensure strict [0, 1] range
 
         # forward pass: reconstruct the input
         output = model(data)
@@ -125,9 +126,9 @@ for epoch in range(num_epochs):
 
             data = data.to(device)
 
-            # normalize input
-            if data.max() > 1.0:
-                data = (data - data.min()) / (data.max() - data.min() + 1e-8)
+            # normalize input (using same global stats as training)
+            data = (data + 80) / 80
+            data = torch.clamp(data, 0.0, 1.0)
 
             output = model(data)
             loss = criterion(output, data)

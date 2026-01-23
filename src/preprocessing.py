@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import torch
 import torchaudio
 import torchaudio.transforms as T
 
@@ -32,9 +33,15 @@ else:
             if waveform.shape[0] > 1:
                 waveform = waveform.mean(dim=0, keepdim=True)
 
-            # limit to first 10 seconds
-            max_samples = min(waveform.shape[1], 10 * sample_rate)
-            waveform = waveform[:, :max_samples]
+            # define target length (10 seconds)
+            target_length = 10 * sample_rate
+
+            # pad with zeros if too short, cut if too long
+            if waveform.shape[1] < target_length:
+                padding_amount = target_length - waveform.shape[1]
+                waveform = torch.nn.functional.pad(waveform, (0, padding_amount))
+            else:
+                waveform = waveform[:, :target_length]
 
             # mel spectrogram
             mel_transform = T.MelSpectrogram(sample_rate=sample_rate, n_fft=2048, n_mels=128, f_max=8000)
