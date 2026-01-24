@@ -6,13 +6,16 @@ This repository contains a music recommendation system that leverages audio reco
 
 ```
 project/
-├── frontend/
+├── .env
+├── .gitignore
+├── README.md
+├── main.py
+├── requirements.txt
+├── songs_with_features.pkl
+├── static/
 │   ├── index.html
 │   ├── style.css
 │   └── script.js
-├── backend/
-│   ├── backend.py
-│   └── requirements.txt
 ├── src/
 │   ├── preprocessing.py
 │   ├── audiopipeline.py
@@ -48,7 +51,7 @@ Simply open `index.html` in your web browser, or use a local server:
 
 ```bash
 # Using Python's built-in server
-cd frontend
+cd static
 python -m http.server 8080
 ```
 

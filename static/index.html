@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Recommendation System</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="content">
+            <!-- Landing Page -->
+            <div class="landing-page" id="landingPage">
+                <div class="hero-content">
+                    <div class="hero-text">
+                        <h1>Music<br>Recommendation<br>System</h1>
+                        <button class="start-btn" onclick="showInputPage()">Get Started</button>
+                    </div>
+                    <div class="hero-image"></div>
+                </div>
+                <div class="credit">BY - KAUSTAV</div>
+            </div>
+
+            <!-- Input Page -->
+            <div class="input-page" id="inputPage">
+                <h2>Enter the name of a song</h2>
+                <div class="input-container">
+                    <div class="error-message" id="errorMessage">Song not found. Please try again.</div>
+                    <div class="loading-message" id="loadingMessage">Searching for recommendations...</div>
+                    <input type="text" id="songInput" placeholder="Example - Out of Time">
+                    <div class="btn-group">
+                        <button class="search-btn" onclick="searchSong()">Search</button>
+                        <button class="back-btn" onclick="showLandingPage()">Back</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Page -->
+            <div class="results-page" id="resultsPage">
+                <h2>Recommendations</h2>
+                <div class="query-info" id="queryInfo"></div>
+                <div id="recommendationsList"></div>
+                <button class="new-search-btn" onclick="showInputPage()">New Search</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>
