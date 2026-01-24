@@ -33,9 +33,6 @@ project/
 ### 1. Backend Setup
 
 ```bash
-# Navigate to backend directory
-cd backend
-
 # Install dependencies
 pip install -r requirements.txt
 
