@@ -1,5 +1,3 @@
-import numpy as np
-import pandas as pd
 from sklearn.metrics.pairwise import cosine_similarity
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -8,6 +6,7 @@ from fastapi.responses import FileResponse
 from pydantic import BaseModel
 import uvicorn
 import os
+import requests
 from database.db_connect import load_all_songs
 
 app = FastAPI()
@@ -21,11 +20,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# load the dataset with latent vectors
-DATA_PATH = "songs_with_features.pkl"
-
 # global variables
-global df
 song_names = []
 latent_matrix = None
 
@@ -65,12 +60,12 @@ async def read_index():
 @app.get("/songs")
 async def get_all_songs():
     """Get list of all available songs"""
-    if df is None:
+    if not song_names:
         raise HTTPException(status_code=500, detail="Dataset not loaded")
 
     return {
-        "songs": df['file_name'].tolist(),
-        "count": len(df)
+        "songs": song_names,
+        "count": len(song_names)
     }
 
 
@@ -117,6 +112,16 @@ async def recommend_songs(request: SongRequest):
         "query_song": matched_full_name,
         "recommendations": recommendations
     }
+
+
+@app.get("/search")
+def search(q: str):
+    """Search iTunes API for music tracks"""
+    url = "https://itunes.apple.com/search"
+    params = {"term": q, "entity": "musicTrack", "limit": 10}
+    r = requests.get(url, params=params).json()
+
+    return r["results"]
 
 
 if __name__ == "__main__":
