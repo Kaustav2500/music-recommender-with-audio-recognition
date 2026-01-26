@@ -1,8 +1,10 @@
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from tqdm import tqdm
 from src.preprocessing import df
+from database.db_connect import save_song
 
 
 # redefine class locally
@@ -92,9 +94,10 @@ with torch.no_grad():
         latent_vec = model.encoder(input_tensor)
 
         # convert to numpy and flatten
-        latent_vectors.append(latent_vec.cpu().numpy().flatten())
+        vector_numpy = latent_vec.cpu().numpy().flatten().astype(np.float32)
 
-# save
-df['latent_vector'] = latent_vectors
-df.to_pickle("../data/songs_with_features.pkl")
-print("Features extracted and saved to ../data/songs_with_features.pkl")
+        # save to db
+        save_song(row['file_name'], vector_numpy)
+
+
+print("Features extracted and saved to MySQL database.")
