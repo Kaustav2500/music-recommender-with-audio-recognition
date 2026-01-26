@@ -3,7 +3,14 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from tqdm import tqdm
-from src.preprocessing import df
+from preprocessing import df
+import os
+import sys
+
+# add parent directory to path to access database module
+parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, parent_dir)
+
 from database.db_connect import save_song
 
 
@@ -60,18 +67,30 @@ class AudioAutoencoder(nn.Module):
         return decoded
 
 
+# get paths
+script_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.dirname(script_dir)
+checkpoint_path = os.path.join(project_root, "models", "audio_autoencoder.pth")
+
 # load model
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print(f"Using device: {device}")
+
 model = AudioAutoencoder().to(device)
 
-checkpoint_path = "../models/audio_autoencoder.pth"
+if not os.path.exists(checkpoint_path):
+    print(f"Model file not found at {checkpoint_path}")
+    print("Please train the autoencoder first by running: cd src && python autoencoder.py")
+    exit()
+
 checkpoint = torch.load(checkpoint_path, map_location=device)
 model.load_state_dict(checkpoint['model_state_dict'])
 model.eval()
 
+print(f"Model loaded from {checkpoint_path}")
+
 # extraction loop
-latent_vectors = []
-print("Extracting features from songs...")
+print(f"\nExtracting features from {len(df)} songs...")
 with torch.no_grad():
     for index, row in tqdm(df.iterrows(), total=df.shape[0]):
         # get the spectrogram
@@ -90,14 +109,25 @@ with torch.no_grad():
         input_tensor = (input_tensor + 80) / 80
         input_tensor = torch.clamp(input_tensor, 0.0, 1.0)
 
-        # run encoder
+        # run encoder to get 256-dimensional latent vector
         latent_vec = model.encoder(input_tensor)
 
         # convert to numpy and flatten
         vector_numpy = latent_vec.cpu().numpy().flatten().astype(np.float32)
 
-        # save to db
-        save_song(row['file_name'], vector_numpy)
+        # extract metadata from filename
+        # example: "Song Name - Artist Name" -> split by " - "
+        parts = row['file_name'].split(' - ')
+        song_name = parts[0].strip() if len(parts) > 0 else row['file_name']
+        artist = parts[1].strip() if len(parts) > 1 else "Unknown"
+
+        # save to db with metadata
+        try:
+            save_song(song_name, artist, vector_numpy)
+        except Exception as e:
+            print(f"\nError saving {song_name}: {e}")
+            continue
 
 
-print("Features extracted and saved to MySQL database.")
+print("\n Features extracted and saved to MySQL database.")
+print(f"Total songs processed: {len(df)}")

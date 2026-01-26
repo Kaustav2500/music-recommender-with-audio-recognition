@@ -1,7 +1,7 @@
 import torch
 import torch.nn.functional as F
 from torch.utils.data import Dataset, DataLoader, random_split
-from src.preprocessing import df
+from preprocessing import df
 
 
 class AudioPipeline(Dataset):

@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from tqdm import tqdm
-from src.audiopipeline import train_loader, test_loader
+from audiopipeline import train_loader, test_loader
 
 class AudioAutoencoder(nn.Module):
     def __init__(self):
