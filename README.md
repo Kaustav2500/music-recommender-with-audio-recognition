@@ -1,121 +1,145 @@
 # Music Recommendation System
 
-This repository contains a music recommendation system that leverages audio recognition technology to suggest songs based on user preferences. The system analyzes audio features and patterns to provide personalized music recommendations.
+This branch transitions the project from a local file-based architecture to a scalable, database-driven system. It integrates the iTunes Search API for automated data acquisition and uses a MySQL backend for persistent storage of song metadata and latent vectors.
+
+---
 
 ## Project Structure
-
 ```
 project/
-├── .env
-├── .gitignore
-├── README.md
-├── main.py
-├── requirements.txt
-├── songs_with_features.pkl
-├── static/
+├── .env                      # Database credentials 
+├── .gitignore                # Version control exclusions
+├── README.md                 # Project documentation
+├── main.py                   # FastAPI server entry point 
+├── requirements.txt          # Project dependencies 
+├── database/
+│   ├── db_connect.py         # MySQL connection logic
+│   └── schema.sql            # Database table definitions
+├── static/                   # Frontend web files
 │   ├── index.html
 │   ├── style.css
 │   └── script.js
-├── src/
-│   ├── preprocessing.py
-│   ├── audiopipeline.py
-│   ├── autoencoder.py
-│   ├── extract_features.py
-│   └── recommender.py
-├── data/
-│   └── songs_with_features.pkl
+├── src/                      # Backend processing scripts
+│   ├── preprocessing.py      # iTunes download & audio processing
+│   ├── audiopipeline.py      # PyTorch dataset & loaders
+│   ├── autoencoder.py        # CNN model definition & training
+│   ├── extract_features.py   # Vector generation & DB sync
+│   ├── recommender.py        # CLI recommendation tool
+│   └── check_db.py           # Database status utility
+├── data/                     # Audio previews and cache
 └── models/
-    └── audio_autoencoder.pth
+    └── audio_autoencoder.pth # Trained model weights
 ```
+
+---
+
+## Features
+
+- **Database-Driven Architecture**: Persistent storage of song metadata and feature vectors in MySQL
+- **Automated Data Collection**: iTunes Search API integration for seamless music data acquisition
+- **Deep Learning Model**: CNN-based autoencoder for extracting meaningful audio features
+- **Cosine Similarity Matching**: Fast recommendation engine using 256-dimensional latent vectors
+- **RESTful API**: FastAPI backend with comprehensive endpoints
+- **Modern Web Interface**: Clean, responsive frontend for user interaction
+
+---
 
 ## Setup Instructions
 
-### 1. Backend Setup
+### 1. Database Configuration
 
+- Ensure MySQL is running on your system
+- Execute the SQL commands in `database/schema.sql` to create the `music_recommender` database and `songs` table
+- Create a `.env` file in the project root with your credentials:
+```env
+DB_USER=your_username
+DB_PASSWORD=your_password
+DB_HOST=localhost
+DB_NAME=music_recommender
+```
+
+### 2. Backend Setup
 ```bash
-# Navigate to backend directory
-cd backend
-
-# Install dependencies
+# Install required libraries
 pip install -r requirements.txt
 
-# Run the FastAPI server
-python backend.py
+# Start the FastAPI server
+python main.py
 ```
 
-The backend will start on `http://localhost:8000`
+The backend will be accessible at `http://localhost:8000`
 
-### 2. Frontend Setup
+### 3. Data Pipeline Execution
 
-Simply open `index.html` in your web browser, or use a local server:
+Run these scripts in order to populate the system:
 
-```bash
-# Using Python's built-in server
-cd static
-python -m http.server 8080
-```
+1. **`src/preprocessing.py`**: Searches iTunes for keywords (e.g., "Weeknd", "KK"), downloads 30s previews, and generates spectrograms
+2. **`src/autoencoder.py`**: Trains the CNN model using the downloaded audio data
+3. **`src/extract_features.py`**: Generates 256-dimensional latent vectors and synchronizes them with MySQL metadata
+4. **`src/check_db.py`**: Verify the song count in your database
 
-Then visit `http://localhost:8080` in your browser.
-
-### 3. Data Preparation
-
-Before running the backend, make sure you have:
-
-1. Processed your audio files using `preprocessing.py`
-2. Trained the autoencoder using `autoencoder.py` through `audiopipeline.py`
-3. Extracted features using `extract_features.py`
-4. The resulting `songs_with_features.pkl` file in the `data/` directory
+---
 
 ## API Endpoints
 
-- `GET /` - Health check
-- `GET /songs` - List all available songs
-- `POST /recommend` - Get recommendations for a song
-
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/` | Serves the primary web interface |
+| `GET` | `/songs` | Retrieves a list of all songs stored in the database |
+| `POST` | `/recommend` | Returns the top 5 similar songs based on cosine similarity |
 
 ### Example API Request
 
+**Endpoint**: `POST /recommend`
 ```json
-// POST /recommend
 {
-    "song_name": "Out of Time"
+    "song_name": "Starboy"
 }
 ```
 
-### Example API Response
-
+**Response**:
 ```json
 {
-    "query_song": "Out of Time - The Weeknd",
     "recommendations": [
         {
-            "name": "Starboy",
-            "similarity": "0.9234"
+            "song_name": "I Feel It Coming",
+            "artist": "The Weeknd",
+            "similarity_score": 0.94
         },
-        {
-            "name": "Blinding Lights",
-            "similarity": "0.9123"
-        },
-        {
-            "name": "Can't Feel My Face",
-            "similarity": "0.8976"
-        }
+        ...
     ]
 }
 ```
 
-## Usage
-
-1. Start the backend server
-2. Open the frontend in your browser
-3. Click "Get Started"
-4. Enter a song name (or part of it)
-5. View your personalized recommendations!
+---
 
 ## Technologies Used
 
-- **Frontend**: HTML, CSS, JavaScript
-- **Backend**: FastAPI, Python
-- **ML**: PyTorch, scikit-learn
-- **Data Processing**: pandas, numpy
-- **Data Visualization**: matplotlib, seaborn
+- **Backend**: FastAPI, MySQL, Python 
+- **Machine Learning**: PyTorch, scikit-learn
+- **Audio Processing**: Torchaudio, FFmpeg
+- **Data Source**: iTunes Search API
+- **Frontend**: HTML5, CSS3, JavaScript 
+
+---
+
+## Future Enhancements
+
+- Add user authentication and personalized playlists
+- Implement collaborative filtering alongside content-based filtering
+- Support for multiple audio sources (Spotify, SoundCloud)
+- Real-time model retraining pipeline
+- Advanced visualization of audio features and similarity clusters
+- Export recommendations to Spotify/Apple Music playlists
+
+---
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+---
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
