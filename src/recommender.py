@@ -50,7 +50,7 @@ if not matches.empty:
     # sort by score (descending)
     sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
 
-    target = 10
+    target = 5
     count = 0
     print("Top Recommendations:")
     for i, score in sim_scores:
