@@ -12,7 +12,7 @@ from database.db_connect import load_all_songs
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # load the dataset from mysql on startup
+    # load the dataset from mysql
     global song_data, latent_matrix
     try:
         print("Connecting to mysql...")

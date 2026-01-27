@@ -36,7 +36,7 @@ def download_from_itunes(queries, output_folder, limit=200):
 
     for query in queries:
         try:
-            print(f"\nsearching for: {query}")
+            print(f"Searching for: {query}")
             params = {"term": query, "entity": "song", "limit": limit}
 
             # search request with timeout
@@ -44,7 +44,7 @@ def download_from_itunes(queries, output_folder, limit=200):
             data = response.json()
 
             results = data.get("results", [])
-            print(f"found {len(results)} songs")
+            print(f"Found {len(results)} songs")
 
             count = 0
             for i, item in enumerate(results):
@@ -77,26 +77,26 @@ def download_from_itunes(queries, output_folder, limit=200):
                         time.sleep(0.1)
 
                     except Exception as e:
-                        print(f"failed to download {filename}: {e}")
+                        print(f"Failed to download {filename}: {e}")
                 else:
                     count += 1
 
         except Exception as e:
-            print(f"error searching {query}: {e}")
+            print(f"Error searching {query}: {e}")
 
 
 # start main logic
 if (FORCE_REPROCESS or not os.path.exists(cache_path)) and INCLUDE_ONLY:
-    print("starting itunes download...")
+    print("Starting itunes download...")
     download_from_itunes(INCLUDE_ONLY, folder_path, limit=DOWNLOAD_LIMIT)
 
 # processing phase
 if os.path.exists(cache_path) and not FORCE_REPROCESS:
-    print(f"loading cached data from {cache_path}...")
+    print(f"Loading cached data from {cache_path}...")
     df = pd.read_pickle(cache_path)
 else:
     if FORCE_REPROCESS:
-        print("\nignoring cache, processing files...")
+        print("Ignoring cache, Processing files...")
 
     files = os.listdir(folder_path)
 
@@ -106,20 +106,20 @@ else:
     # filter by name
     if INCLUDE_ONLY:
         audio_files = [f for f in audio_files if any(x.lower() in f.lower() for x in INCLUDE_ONLY)]
-        print(f"total matching files: {len(audio_files)}")
+        print(f"Total matching files: {len(audio_files)}")
 
     if not audio_files:
-        print("no songs found")
+        print("No songs found")
         exit()
 
     # limit songs
     if len(audio_files) > MAX_SONGS:
-        print(f"limiting to {MAX_SONGS} songs")
+        print(f"Limiting to {MAX_SONGS} songs")
         audio_files = audio_files[:MAX_SONGS]
 
     song_data = []
 
-    print("converting audio to spectrograms...")
+    print("Converting audio to spectrograms...")
     for file in audio_files:
         path = os.path.join(folder_path, file)
 
@@ -142,13 +142,17 @@ else:
 
         # target length
         target_length = 10 * sample_rate
+        total_samples = waveform.shape[1]
 
-        # pad or cut
-        if waveform.shape[1] < target_length:
-            padding = target_length - waveform.shape[1]
+        # center crop logic
+        if total_samples > target_length:
+            # calculate start point to get the middle
+            start = (total_samples - target_length) // 2
+            waveform = waveform[:, start:start + target_length]
+        elif total_samples < target_length:
+            # pad if too short
+            padding = target_length - total_samples
             waveform = torch.nn.functional.pad(waveform, (0, padding))
-        else:
-            waveform = waveform[:, :target_length]
 
         # mel spectrogram
         mel_transform = T.MelSpectrogram(sample_rate=sample_rate, n_fft=2048, n_mels=128, f_max=8000)

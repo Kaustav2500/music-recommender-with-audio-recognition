@@ -48,28 +48,25 @@ if not matches.empty:
     sim_scores = list(enumerate(similarities.flatten()))
 
     # sort by score (descending)
-    sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)[1:6]
+    sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
 
-    # print recommendations
+    target = 10
     count = 0
-    print("\nTop 5 Recommendations:")
+    print("Top Recommendations:")
     for i, score in sim_scores:
-        # skip the query song itself
         if i == query_index:
             continue
 
         rec_name = df.iloc[i]['name']
         rec_artist = df.iloc[i]['artist']
 
-        # skip exact name duplicates
         if rec_name.lower().strip() == matched_name.lower().strip():
             continue
 
         print(f"{rec_name} - {rec_artist} (Similarity: {score:.4f})")
-
-        # stop after 5 valid recommendations
         count += 1
-        if count >= 5:
+
+        if count >= target:
             break
 else:
     print(f"No song found containing the name: {query_name}")
