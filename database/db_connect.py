@@ -15,7 +15,7 @@ def get_db_connection():
         user=os.getenv("DB_USER", "root"),
         password=os.getenv("DB_PASSWORD", ""),
         database=os.getenv("DB_NAME", "music_recommender"),
-        auth_plugin='mysql_native_password'
+        auth_plugin='mysql_native_password'  # specify authentication plugin
     )
 
 

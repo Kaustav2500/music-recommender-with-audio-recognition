@@ -78,6 +78,8 @@ function displayResults(data) {
             <div class="song-name">SONG ${index + 1}</div>
             <div class="song-details">
                 Song Name - ${song.name}<br>
+                Artist - ${song.artist}<br>
+                ${song.album ? `Album - ${song.album}<br>` : ''}
                 Similarity Score - ${song.similarity}
             </div>
             <div class="song-year">Rank<br>#${index + 1}</div>

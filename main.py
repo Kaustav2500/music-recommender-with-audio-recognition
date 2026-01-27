@@ -81,7 +81,7 @@ async def recommend_songs(request: SongRequest):
 
     query_name = request.song_name.strip()
 
-    # find matching songs (case-insensitive partial match)
+    # find matching songs]
     try:
         query_index = next(i for i, song in enumerate(song_data) if query_name.lower() in song['name'].lower())
         matched_song = song_data[query_index]
@@ -91,10 +91,10 @@ async def recommend_songs(request: SongRequest):
             detail=f"No song found containing '{query_name}'"
         )
 
-    # extract the 256 dim latent vector
+    # extract the 256 dim latent vector for the query song
     query_vector = latent_matrix[query_index].reshape(1, -1)
 
-    # compute cosine similarity
+    # compute cosine similarity against all songs
     similarities = cosine_similarity(query_vector, latent_matrix)
 
     # create list of (index, similarity_score) tuples
@@ -103,15 +103,19 @@ async def recommend_songs(request: SongRequest):
     # sort by similarity (descending)
     sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)[1:6]
 
-    # format recommendations with metadata
+    # format recommendations with metadata from database
     recommendations = []
     for idx, score in sim_scores:
         song = song_data[idx]
-        recommendations.append({
+        rec = {
             "name": song['name'],
             "artist": song.get('artist', 'Unknown'),
             "similarity": f"{score:.4f}"
-        })
+        }
+        # add album if available
+        if song.get('album'):
+            rec['album'] = song['album']
+        recommendations.append(rec)
 
     return {
         "query_song": f"{matched_song['name']} - {matched_song.get('artist', 'Unknown')}",

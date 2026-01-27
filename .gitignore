@@ -5,3 +5,4 @@ data/
 .idea/shelf/
 .idea/dictionaries/
 models/audio_autoencoder.pth
+src/check_db.py
