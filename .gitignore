@@ -1,7 +1,4 @@
 .venv/
 .env
 data/
-.idea/workspace.xml
-.idea/shelf/
-.idea/dictionaries/
 models/audio_autoencoder.pth
