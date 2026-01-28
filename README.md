@@ -2,6 +2,8 @@
 
 A content-based music recommendation system that suggests songs based on their audio features (timbre and dynamics) and metadata. It uses a **Statistical Feature Extractor** to analyze spectrograms and a **MySQL** database for scalable storage.
 
+Note: This system is currently a prototype processed using a local dataset. For commercial applications or production environments, the model requires training on a significantly larger and more diverse high-volume dataset to ensure robust recommendation accuracy and coverage.
+
 ---
 
 ## Key Features
