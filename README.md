@@ -2,6 +2,8 @@
 
 This repository contains a music recommendation system that leverages audio recognition technology to suggest songs based on user preferences. The system analyzes audio features and patterns to provide personalized music recommendations.
 
+Note: This system is currently a prototype processed using a local dataset of 230 songs. For commercial applications or production environments, the model requires training on a significantly larger and more diverse high-volume dataset to ensure robust recommendation accuracy and coverage.
+
 ---
 
 ## Project Structure
