@@ -2,6 +2,8 @@
 
 This repository contains a music recommendation system that leverages audio recognition technology to suggest songs based on user preferences. The system analyzes audio features and patterns to provide personalized music recommendations.
 
+---
+
 ## Project Structure
 
 ```
@@ -27,6 +29,8 @@ project/
 └── models/
     └── audio_autoencoder.pth
 ```
+
+---
 
 ## Setup Instructions
 
@@ -54,6 +58,8 @@ python -m http.server 8080
 
 Then visit `http://localhost:8080` in your browser.
 
+---
+
 ### 3. Data Preparation
 
 Before running the backend, make sure you have:
@@ -62,6 +68,8 @@ Before running the backend, make sure you have:
 2. Trained the autoencoder using `autoencoder.py` through `audiopipeline.py`
 3. Extracted features using `extract_features.py`
 4. The resulting `songs_with_features.pkl` file in the `data/` directory
+
+---
 
 ## API Endpoints
 
@@ -101,6 +109,15 @@ Before running the backend, make sure you have:
 }
 ```
 
+---
+
+## CLI Tool 
+```bash
+python src/recommender.py
+```
+
+---
+
 ## Usage
 
 1. Start the backend server
@@ -109,6 +126,8 @@ Before running the backend, make sure you have:
 4. Enter a song name (or part of it)
 5. View your personalized recommendations!
 
+---
+
 ## Technologies Used
 
 - **Frontend**: HTML, CSS, JavaScript
@@ -116,3 +135,16 @@ Before running the backend, make sure you have:
 - **ML**: PyTorch, scikit-learn
 - **Data Processing**: pandas, numpy
 - **Data Visualization**: matplotlib, seaborn
+
+---
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+---
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
